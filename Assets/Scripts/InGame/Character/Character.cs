@@ -156,7 +156,6 @@ public abstract class Character : MonoBehaviour
             {
                 Attack();
                 Move();
-                Jump();
                 Rolling();
             }
 
@@ -194,7 +193,7 @@ public abstract class Character : MonoBehaviour
 
     protected void Move()
     {
-        if (!isRoll && !isTalk && !isGuard)
+        if (!isRoll && !isTalk && !isGuard && !isAttack)
         {
             joystick_InputX = joystick.GetInputX();
             if (joystick_InputX < 0)
@@ -206,9 +205,9 @@ public abstract class Character : MonoBehaviour
         }
     }
 
-    public void Jump(int num = 0)
+    public void Jump()
     {
-        if (Input.GetKeyDown(KeyCode.Space) || num != 0 && !isRoll && !isTalk && !isJump)
+        if (!isRoll && !isTalk && !isJump && !isAttack)
         {
             if (!isJump)
                 isJump = true;
@@ -220,7 +219,7 @@ public abstract class Character : MonoBehaviour
 
     public void Rolling(int num = 0)
     {
-        if (Input.GetKeyDown(KeyCode.LeftShift) || num != 0 && !isRoll && isGround)
+        if (Input.GetKeyDown(KeyCode.LeftShift) || num != 0 && !isRoll && isGround && !isAttack)
         {
             rigid.velocity = new Vector2(currentDirection * 8, rigid.velocity.y);
             col.enabled = false;
@@ -294,6 +293,7 @@ public abstract class Character : MonoBehaviour
         playerSkillPoint++;
         StartCoroutine(GameManager.instance.ChangeInfoText($"·¹º§¾÷! {playerLevel}"));
         FindObjectOfType<SkillUI>().PointUpdate();
+        FindObjectOfType<EquipUI>().StatusUpdate();
         currentExp = 0 + tempExp;
         maxExp *= 1.1f;
     }
