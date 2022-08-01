@@ -56,7 +56,7 @@ public class PVPWarrior : PVPCharacter
 
     public override void UsingSkill(PlayerSkillData data)
     {
-        if (!isDead)
+        if (!isDead && !isAttack)
         {
             if (data.skill.skillName == "Guard")
             {

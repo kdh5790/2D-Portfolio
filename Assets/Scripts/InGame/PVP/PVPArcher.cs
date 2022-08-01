@@ -38,8 +38,9 @@ public class PVPArcher : PVPCharacter
 
     public override void Attack()
     {
-        if (!isRoll && !isGuard && ptView.IsMine && !isDead) // && isStart
+        if (!isRoll && !isGuard && ptView.IsMine && !isDead && !isAttack) // && isStart
         {
+            isAttack = true;
             ptView.RPC("RPCTriggerAnimation", RpcTarget.AllBuffered, "RangeAttack");
         }
     }

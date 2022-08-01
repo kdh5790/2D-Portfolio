@@ -57,7 +57,7 @@ public class PVPArrow : MonoBehaviourPunCallbacks
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.tag == "Player" && collision.GetComponent<PVPCharacter>().ptView.IsMine && collision.GetComponent<PVPCharacter>().isPVP && collision.name != player.name)
+        if (collision.tag == "Player" && collision.GetComponent<PVPCharacter>().ptView.IsMine && player.ptView.ViewID != collision.GetComponent<PhotonView>().ViewID)
         {
             collision.GetComponent<PVPCharacter>().Hit(player.playerDamage);
             ptView.RPC("InactiveArrow", RpcTarget.AllBuffered);

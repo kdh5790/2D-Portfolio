@@ -11,6 +11,8 @@ public class AttackButton : MonoBehaviour
     public GameObject attack;
     public GameObject check;
 
+    public Button jumpButton;
+
     bool isAttack;
 
     public void TalkToNPC()

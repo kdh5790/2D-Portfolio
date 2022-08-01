@@ -8,7 +8,7 @@ public class ActionButton : MonoBehaviour
 
     private bool isOpen;
 
-    public void JumpButton() => FindObjectOfType<Character>().Jump(1);
+    public void JumpButton() => FindObjectOfType<Character>().Jump();
     public void AttackButton() => FindObjectOfType<Character>().Attack(1);
 
     public void OpenButton()

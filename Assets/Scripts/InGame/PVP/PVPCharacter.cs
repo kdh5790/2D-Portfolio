@@ -17,6 +17,7 @@ public abstract class PVPCharacter : MonoBehaviourPunCallbacks, IPunObservable
     public AudioSource source;
     public DamageText _text;
 
+    protected Button button;
     protected Joystick joystick;
     protected CapsuleCollider2D col;
     protected Rigidbody2D rigid;
@@ -67,6 +68,7 @@ public abstract class PVPCharacter : MonoBehaviourPunCallbacks, IPunObservable
         anim = GetComponent<Animator>();
         sprite = GetComponent<SpriteRenderer>();
         joystick = FindObjectOfType<Joystick>();
+        button = FindObjectOfType<AttackButton>().jumpButton;
 
         if (PVPManager.instance != null)
             PVPManager.instance.players.Add(this);
@@ -106,21 +108,25 @@ public abstract class PVPCharacter : MonoBehaviourPunCallbacks, IPunObservable
 
     protected void Move()
     {
-        axis = joystick.GetInputX();
-        rigid.velocity = new Vector2(axis * walkSpeed, rigid.velocity.y);
-        if (axis != 0)
-            ptView.RPC("FlipSprite", RpcTarget.AllBuffered, axis);
+        if (!isDead && !isAttack)
+        {
+            axis = joystick.GetInputX();
+            rigid.velocity = new Vector2(axis * walkSpeed, rigid.velocity.y);
+            if (axis != 0)
+                ptView.RPC("FlipSprite", RpcTarget.AllBuffered, axis);
+        }
     }
 
     public void Jump()
     {
         if ((jumpCount < 1 || isGround) && !isRoll && !isGuard && !isDead)
         {
-            if (!isJump)
-                isJump = true;
-            jumpCount++;
+            isJump = true;
+
+            Debug.Log($"jumpcount : {jumpCount}");
             rigid.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);
             ptView.RPC("RPCTriggerAnimation", RpcTarget.AllBuffered, "Jump");
+            jumpCount++;
         }
     }
 
@@ -145,7 +151,12 @@ public abstract class PVPCharacter : MonoBehaviourPunCallbacks, IPunObservable
                 anim.SetBool("isGround", true);
                 isJump = false;
                 jumpCount = 0;
-                isGround = true;
+                if (!isGround)
+                {
+                    isGround = true;
+                    button.enabled = false;
+                    StartCoroutine(JumpDelay());
+                }
             }
             else
             {
@@ -153,6 +164,12 @@ public abstract class PVPCharacter : MonoBehaviourPunCallbacks, IPunObservable
                 isGround = false;
             }
         }
+    }
+
+    IEnumerator JumpDelay()
+    {
+        yield return new WaitForSeconds(0.2f);
+        button.enabled = true;
     }
 
     protected void MoveCheck()
@@ -174,16 +191,19 @@ public abstract class PVPCharacter : MonoBehaviourPunCallbacks, IPunObservable
     [PunRPC]
     protected void FlipSprite(float axis)
     {
-        if (axis > 0)
+        if (!isAttack)
         {
-            sprite.flipX = false;
-            currentDirection = 1;
-        }
+            if (axis > 0)
+            {
+                sprite.flipX = false;
+                currentDirection = 1;
+            }
 
-        else if (axis < 0)
-        {
-            sprite.flipX = true;
-            currentDirection = -1;
+            else if (axis < 0)
+            {
+                sprite.flipX = true;
+                currentDirection = -1;
+            }
         }
     }
 
@@ -202,6 +222,7 @@ public abstract class PVPCharacter : MonoBehaviourPunCallbacks, IPunObservable
 
         else if (currentHp <= 0)
         {
+            axis = 0;
             isDead = true;
             currentHp = 0;
             SetFillAmount();
@@ -230,6 +251,11 @@ public abstract class PVPCharacter : MonoBehaviourPunCallbacks, IPunObservable
                     RaidManager.instance.RaidFail();
 
                 PhotonNetwork.Destroy(gameObject);
+            }
+
+            else if (isPVP)
+            {
+
             }
         }
     }

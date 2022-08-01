@@ -19,7 +19,7 @@ public class PVPWeapon : MonoBehaviour
             return;
         }
 
-        if (col.tag == "Player" && col.GetComponent<PVPCharacter>().ptView.IsMine && col.GetComponent<PVPCharacter>().isPVP && character.name != col.name)
+        if (col.tag == "Player" && col.GetComponent<PVPCharacter>().ptView.IsMine && col.GetComponent<PVPCharacter>().isPVP && character.ptView.ViewID != col.GetComponent<Photon.Pun.PhotonView>().ViewID)
         {
             Debug.Log("hit");
 
